@@ -14,9 +14,11 @@ for x in range(1,10):
     param = svm_parameter('-t 0 -v 10 -h 0 -q')
     m = svm_train(prob, param, '-q')
 
+print("\n")
+
 # polynomial with degree 5
 for x in range(1,10):
-    print("\n10-fold Polynomial Kernel - iteration #", x)
+    print("10-fold Polynomial Kernel - iteration #", x)
     param = svm_parameter('-t 1 -d 5 -v 10 -h 0 -q')
     m = svm_train(prob, param, '-q')
 
