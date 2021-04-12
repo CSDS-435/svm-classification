@@ -1,6 +1,6 @@
 import sys
 sys.path.append("/Users/minhqpham/Documents/CWRU/Spring 2021/CSDS 435/libsvm/python")
-print(sys.path)
+# print(sys.path)
 
 from svmutil import *
 from commonutil import *
