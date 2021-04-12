@@ -25,7 +25,7 @@ def adaboost(record_weights, y, x, iter, tolerance=0.00001):
 
     for i in range(1, iter):
         print("Iteration", i)
-        svm = svm_train(record_weights, y, x, '-t 0 -h 0')
+        svm = svm_train(record_weights, y, x, '-t 0 -h 0 -q')
         c = classifier(svm)
         p_labels, p_acc, p_vals = svm_predict(y, x, c.svm)
         p_labels = np.array(p_labels).astype(np.float64)
