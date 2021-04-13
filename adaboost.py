@@ -26,7 +26,10 @@ def adaboost(y, x, iter, tolerance=0.00001):
 
     for i in range(1, iter+1):
         print("Iteration", i)
-        svm = svm_train(weights, y, x, '-t 0 -q')
+        prob = svm_problem(weights, y, x)
+        param = svm_parameter('-t 0 -h 0 -q')
+        svm = svm_train(prob, param)
+
         c = classifier(svm)
 
         p_labels, p_acc, p_vals = svm_predict(y, x, c.svm)
@@ -55,7 +58,7 @@ def adaboost(y, x, iter, tolerance=0.00001):
 def predict(classifiers, y, x):
     predictions = [0] * len(x)
     for c in classifiers:
-        p_labels, p_acc, p_vals = svm_predict([], x, classifiers, '-q')
+        p_labels, p_acc, p_vals = svm_predict([], x, c.svm, '-q')
         for i in range(len(x)):
             predictions[i] += (c.weight * p_labels[i])
         
@@ -72,22 +75,22 @@ def predict(classifiers, y, x):
     return predictions, accuracy
 
 if __name__ == "__main__":
-    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train', return_scipy=False)
+    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train')
 
     print("Training AdaBoost K = 10...")
     classifiers = adaboost(y, x, 10)
 
     print('Testing...')
-    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test', return_scipy=False)
+    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test')
     prediction, accuracy = predict(classifiers, y_test, x_test)
     print("K = 10", "Accuracy:", accuracy)
     
-    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train', return_scipy=False)
+    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train')
 
     print("Training AdaBoost K = 20...")
     classifiers = adaboost(y, x, 20)
 
     print('Testing...')
-    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test', return_scipy=False)
+    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test')
     prediction, accuracy = predict(classifiers, y_test, x_test)
     print("K = 20", "Accuracy:", accuracy)
