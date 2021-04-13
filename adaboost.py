@@ -23,7 +23,7 @@ class classifier:
 def adaboost(record_weights, y, x, iter, tolerance=0.00001):
     classifiers = []
 
-    for i in range(1, iter):
+    for i in range(1, iter+1):
         print("Iteration", i)
         svm = svm_train(record_weights, y, x, '-t 0 -h 0 -q')
         c = classifier(svm)
