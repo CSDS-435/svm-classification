@@ -20,29 +20,31 @@ class classifier:
 # train by adaboost
 # takes weights of record, problem input, number of iterations, and tolarance level
 # returns set of updated classifiers
-def adaboost(record_weights, y, x, iter, tolerance=0.00001):
+def adaboost(y, x, iter, tolerance=0.00001):
     classifiers = []
+    weights = np.ones(len(y))/(len(y))
 
     for i in range(1, iter+1):
         print("Iteration", i)
-        svm = svm_train(record_weights, y, x, '-t 0 -h 0 -q')
+        svm = svm_train(weights, y, x, '-t 0 -q')
         c = classifier(svm)
+
         p_labels, p_acc, p_vals = svm_predict(y, x, c.svm)
         p_labels = np.array(p_labels).astype(np.float64)
 
         err = 0
         for i in range(len(y)):
             if p_labels[i] != y[i]:
-                err += record_weights[i]
-
+                err += weights[i]
+        
         c.update_weight(err)
         classifiers.append(c)
 
         if err < tolerance:
             break
 
-        record_weights = record_weights * np.exp(-c.weight * np.array(y) * p_labels)
-        record_weights /= np.sum(record_weights)
+        weights = weights * np.exp(-c.weight * np.array(y) * p_labels)
+        weights /= np.sum(weights)
 
     return classifiers
 
@@ -53,7 +55,7 @@ def adaboost(record_weights, y, x, iter, tolerance=0.00001):
 def predict(classifiers, y, x):
     predictions = [0] * len(x)
     for c in classifiers:
-        p_labels, p_acc, p_vals = svm_predict(y, x, c.svm)
+        p_labels, p_acc, p_vals = svm_predict([], x, classifiers, '-q')
         for i in range(len(x)):
             predictions[i] += (c.weight * p_labels[i])
         
@@ -66,26 +68,26 @@ def predict(classifiers, y, x):
         if y[i] == predictions[i]:
             matches += 1
     
-    accuracy = matches/len(y) * 100
+    accuracy = matches/len(x) * 100
     return predictions, accuracy
 
 if __name__ == "__main__":
-    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train')
+    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train', return_scipy=False)
 
-    w = np.ones(len(y))/(len(y))
-    
     print("Training AdaBoost K = 10...")
-    classifiers = adaboost(w, y, x, 10)
+    classifiers = adaboost(y, x, 10)
 
     print('Testing...')
-    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test')
+    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test', return_scipy=False)
     prediction, accuracy = predict(classifiers, y_test, x_test)
     print("K = 10", "Accuracy:", accuracy)
+    
+    y, x = svm_read_problem('DogsVsCats/DogsVsCats.train', return_scipy=False)
 
     print("Training AdaBoost K = 20...")
-    classifiers = adaboost(w, y, x, 20)
+    classifiers = adaboost(y, x, 20)
 
     print('Testing...')
-    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test')
+    y_test, x_test = svm_read_problem('DogsVsCats/DogsVsCats.test', return_scipy=False)
     prediction, accuracy = predict(classifiers, y_test, x_test)
     print("K = 20", "Accuracy:", accuracy)
